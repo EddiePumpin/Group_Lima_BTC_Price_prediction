@@ -9,7 +9,13 @@ from btc_data_processing import load_clean_coinmarketcap_csv, validate_cleaned_d
 
 
 def test_coinmarketcap_csv_loads_and_cleans():
-    csv_path = Path("Bitcoin_5_11_2020-5_11_2026_historical_data_coinmarketcap.csv")
+    csv_path = Path("btc_yfinance_2015_2026.csv")
+    # Quick check of raw yfinance CSV column names
+    raw = pd.read_csv(csv_path)
+    assert any(c in raw.columns for c in ["Date", "Datetime", "date"]), "Expected Date/Datetime column in raw CSV."
+    required_cols = {"Open", "High", "Low", "Close", "Volume"}
+    assert required_cols.issubset(set(raw.columns)), f"Raw CSV missing required OHLCV columns: {required_cols - set(raw.columns)}"
+
     df = load_clean_coinmarketcap_csv(csv_path)
     validate_cleaned_dataframe(df)
 
